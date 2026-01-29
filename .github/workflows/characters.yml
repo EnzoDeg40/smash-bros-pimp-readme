@@ -1,0 +1,32 @@
+name: Characters processor
+
+on:
+  workflow_call:
+    inputs:
+      characters:
+        description: "Characters mapping (YAML string)"
+        required: true
+        type: string
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install deps
+        run: |
+          pip install pyyaml
+
+      - name: Run script
+        env:
+          CHARACTERS: ${{ inputs.characters }}
+        run: |
+          python script.py
