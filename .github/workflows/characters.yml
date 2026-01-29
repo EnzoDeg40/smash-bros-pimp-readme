@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
+          repository: enzodeg40/smash-bros-pimp-readme
 
       - name: Setup Python
         uses: actions/setup-python@v5
