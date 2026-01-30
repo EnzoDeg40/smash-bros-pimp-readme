@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Generate renders content
     renders_content = "\n".join(
-        [f"- {name}: {character}" for name, character in characters.items()]
+        [f"- ![${{{name}}}](.smash/assets/{name}.png) : {character}" for name, character in characters.items()]
     )
 
     # Replace content between markers

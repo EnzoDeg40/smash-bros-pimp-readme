@@ -168,7 +168,7 @@ def draw_text_username(
     img: Image.Image,
     text: str,
     position: tuple[int, int] | None = None,
-    font_name: str = "fonnts.com-kropotkin_bold.otf",
+    font_name: str = "Gotham Black Regular.ttf",
     font_size: int = 32,
     text_color: str | tuple = "black",
     outline_color: str | tuple = "white",
@@ -309,7 +309,7 @@ def generate_image(
         if player >= 1 and player <= 8:
             r = draw_text_player_number(
                 r,
-                number=f"123456P{player}",
+                number=f"P{player}",
                 position=(140, 360),
                 font_size=60,
             )
