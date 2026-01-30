@@ -2,40 +2,53 @@ import os
 
 import yaml
 
-import src.images as images
+import images
 
-characters_raw = os.environ.get("CHARACTERS")
+if __name__ == "__main__":
+    characters_raw = os.environ.get("CHARACTERS")
 
-if not characters_raw:
-    raise ValueError("No CHARACTERS input provided")
+    if not characters_raw:
+        raise ValueError("No CHARACTERS input provided")
 
-characters = yaml.safe_load(characters_raw)
+    characters = yaml.safe_load(characters_raw)
 
-print("Characters received:")
-for name, character in characters.items():
-    print(f"- {name} → {character}")
+    print("Characters received:")
+    for name, character in characters.items():
+        print(f"- {name} → {character}")
 
-# Update README in target repo
-readme_path = "../target-repo/README.md"
+    assets_path = "../target-repo/.smash/assets"
+    os.makedirs(assets_path, exist_ok=True)
 
-with open(readme_path, "r") as f:
-    content = f.read()
+    i = 1
+    for name, character in characters.items():
+        r = images.generate_image(name, character, variante=1, player=i)
+        with open(os.path.join(assets_path, f"{name}.png"), "wb") as img_file:
+            img_file.write(r)
+        i += 1
 
-# Generate renders content
-renders_content = "\n".join([f"- {name}: {character}" for name, character in characters.items()])
+    # Update README in target repo
+    readme_path = "../target-repo/README.md"
 
-# Replace content between markers
-start_marker = "<!-- SMASH_TEAM_START -->"
-end_marker = "<!-- SMASH_TEAM_END -->"
+    with open(readme_path, "r") as f:
+        content = f.read()
 
-if start_marker in content and end_marker in content:
-    before = content.split(start_marker)[0]
-    after = content.split(end_marker)[1]
-    new_content = f"{before}{start_marker}\n{renders_content}\n{end_marker}{after}"
-    
-    with open(readme_path, "w") as f:
-        f.write(new_content)
-    
-    print(f"\nREADME updated at {readme_path}")
-else:
-    print(f"\nWarning: Could not find markers in README")
+    # Generate renders content
+    renders_content = "\n".join(
+        [f"- {name}: {character}" for name, character in characters.items()]
+    )
+
+    # Replace content between markers
+    start_marker = "<!-- SMASH_TEAM_START -->"
+    end_marker = "<!-- SMASH_TEAM_END -->"
+
+    if start_marker in content and end_marker in content:
+        before = content.split(start_marker)[0]
+        after = content.split(end_marker)[1]
+        new_content = f"{before}{start_marker}\n{renders_content}\n{end_marker}{after}"
+
+        with open(readme_path, "w") as f:
+            f.write(new_content)
+
+        print(f"\nREADME updated at {readme_path}")
+    else:
+        print(f"\nWarning: Could not find markers in README")
