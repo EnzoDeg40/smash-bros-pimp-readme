@@ -50,4 +50,5 @@ jobs:
           git add README.md
           git add .smash
           git diff --staged --quiet || git commit -m "Update README with character renders"
+          git pull --rebase origin main
           git push
