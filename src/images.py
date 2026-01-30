@@ -281,8 +281,8 @@ def draw_text_player_number(
 
 
 def generate_image(
-    username: str, name: str, variante: int = 1, player: int = 0
-) -> bool:
+    username: str, name: str, variante: int = 1, player: int = 0, show: bool = False
+) -> Image.Image | None:
     try:
         cpu_img = load_image_game("cpu")
         front_img = load_image_game("front")
@@ -314,19 +314,20 @@ def generate_image(
                 font_size=60,
             )
 
-        r.show()
-        return True
+        if show:
+            r.show()
+        return r
     except Exception as e:
         print(f"Error generating image for {name}: {e}")
-        return False
+        return None
 
 
 if __name__ == "__main__":
-    generate_image("enzo", "mario", variante=1, player=1)
-    generate_image("pamela", "peach", variante=1, player=2)
-    generate_image("alex", "link", variante=2, player=3)
-    generate_image("chris", "samus", variante=1, player=4)
-    generate_image("jordan", "pikachu", variante=1, player=5)
-    generate_image("taylor", "kirby", variante=1, player=6)
-    generate_image("morgan", "fox", variante=1, player=7)
-    generate_image("casey", "yoshi", variante=1, player=8)
+    generate_image("enzo", "mario", variante=1, player=1, show=True)
+    generate_image("pamela", "peach", variante=1, player=2, show=True)
+    generate_image("alex", "link", variante=2, player=3, show=True)
+    generate_image("chris", "samus", variante=1, player=4, show=True)
+    generate_image("jordan", "pikachu", variante=1, player=5, show=True)
+    generate_image("taylor", "kirby", variante=1, player=6, show=True)
+    generate_image("morgan", "fox", variante=1, player=7, show=True)
+    generate_image("casey", "yoshi", variante=1, player=8, show=True)

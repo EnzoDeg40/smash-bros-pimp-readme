@@ -21,9 +21,12 @@ if __name__ == "__main__":
 
     i = 1
     for name, character in characters.items():
-        r = images.generate_image(name, character, variante=1, player=i)
-        with open(os.path.join(assets_path, f"{name}.png"), "wb") as img_file:
-            img_file.write(r)
+        img = images.generate_image(name, character, variante=1, player=i)
+        if img:
+            img.save(os.path.join(assets_path, f"{name}.png"))
+            print(f"✅ Generated image for {name}")
+        else:
+            print(f"❌ Failed to generate image for {name}")
         i += 1
 
     # Update README in target repo
