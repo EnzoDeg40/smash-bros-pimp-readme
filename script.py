@@ -1,5 +1,8 @@
 import os
+
 import yaml
+
+import src.images as images
 
 characters_raw = os.environ.get("CHARACTERS")
 
@@ -22,8 +25,8 @@ with open(readme_path, "r") as f:
 renders_content = "\n".join([f"- {name}: {character}" for name, character in characters.items()])
 
 # Replace content between markers
-start_marker = "<!-- RENDERS_START -->"
-end_marker = "<!-- RENDERS_END -->"
+start_marker = "<!-- SMASH_TEAM_START -->"
+end_marker = "<!-- SMASH_TEAM_END -->"
 
 if start_marker in content and end_marker in content:
     before = content.split(start_marker)[0]

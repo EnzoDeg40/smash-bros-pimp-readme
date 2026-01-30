@@ -33,7 +33,7 @@ jobs:
 
       - name: Install deps
         run: |
-          pip install pyyaml
+          pip install -r smash-bros-pimp-readme/requirements.txt
 
       - name: Run script
         env:
