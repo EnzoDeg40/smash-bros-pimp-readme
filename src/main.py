@@ -13,15 +13,32 @@ if __name__ == "__main__":
     characters = yaml.safe_load(characters_raw)
 
     print("Characters received:")
-    for name, character in characters.items():
-        print(f"- {name} → {character}")
+    for name, config in characters.items():
+        # Support both old format (string) and new format (dict)
+        if isinstance(config, str):
+            character = config
+            github = None
+            variant = 1
+        else:
+            character = config.get("character")
+            github = config.get("github")
+            variant = config.get("variant", 1)
+        print(f"- {name} → {character} (variant: {variant}, github: {github or 'N/A'})")
 
     assets_path = "../target-repo/.smash/assets"
     os.makedirs(assets_path, exist_ok=True)
 
     i = 1
-    for name, character in characters.items():
-        img = images.generate_image(name, character, variante=1, player=i)
+    for name, config in characters.items():
+        # Support both old format (string) and new format (dict)
+        if isinstance(config, str):
+            character = config
+            variant = 1
+        else:
+            character = config.get("character")
+            variant = config.get("variant", 1)
+        
+        img = images.generate_image(name, character, variante=variant, player=i)
         if img:
             img.save(os.path.join(assets_path, f"{name}.png"))
             print(f"✅ Generated image for {name}")
@@ -35,10 +52,20 @@ if __name__ == "__main__":
     with open(readme_path, "r") as f:
         content = f.read()
 
-    # Generate renders content
-    renders_content = "\n".join(
-        [f"![](.smash/assets/{name}.png)" for name in characters.keys()]
-    )
+    # Generate renders content with GitHub links
+    renders_lines = []
+    for name, config in characters.items():
+        if isinstance(config, str):
+            github = None
+        else:
+            github = config.get("github")
+        
+        if github:
+            renders_lines.append(f"[![{name}](.smash/assets/{name}.png)](https://github.com/{github})")
+        else:
+            renders_lines.append(f"![](.smash/assets/{name}.png)")
+    
+    renders_content = "\n".join(renders_lines)
 
     # Replace content between markers
     start_marker = "<!-- SMASH_TEAM_START -->"
