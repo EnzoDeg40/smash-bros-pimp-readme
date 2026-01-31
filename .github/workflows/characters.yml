@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: enzodeg40/smash-bros-pimp-readme
+          ref: main
           path: smash-bros-pimp-readme
 
       - name: Checkout calling repo
