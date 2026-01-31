@@ -314,6 +314,8 @@ def generate_image(
                 font_size=60,
             )
 
+        r = resize_image_proportional(r, target_width=200)
+
         if show:
             r.show()
         return r
