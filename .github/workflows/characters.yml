@@ -40,6 +40,12 @@ jobs:
           CHARACTERS: ${{ inputs.characters }}
         run: |
           cd smash-bros-pimp-readme
+          # Reset target-repo to latest remote state before generating
+          cd ../target-repo
+          git fetch origin
+          git reset --hard origin/main
+          # Now generate the images
+          cd ../smash-bros-pimp-readme
           python src/main.py
 
       - name: Commit and push changes
@@ -50,5 +56,4 @@ jobs:
           git add README.md
           git add .smash
           git diff --staged --quiet || git commit -m "Update README with character renders"
-          git pull --rebase origin main
           git push
