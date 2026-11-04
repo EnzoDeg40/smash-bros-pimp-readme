@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 color = {
     "p1": (158, 238, 169),
@@ -156,6 +156,41 @@ def alpha_center_x(img: Image.Image) -> float:
     return weighted / total if total else width / 2
 
 
+def card_inner_mask(card_img: Image.Image, max_border_brightness: int = 15) -> Image.Image:
+    card_img = card_img.convert("RGBA")
+    pixels = card_img.load()
+    width, height = card_img.size
+
+    # white pixels stop the fill: only the transparent margin and the border let it through
+    mask = Image.new("L", card_img.size, 0)
+    mask_pixels = mask.load()
+    for y in range(height):
+        for x in range(width):
+            r, g, b, a = pixels[x, y]
+            if a > 0 and max(r, g, b) > max_border_brightness:
+                mask_pixels[x, y] = 255
+
+    ImageDraw.floodfill(mask, (0, 0), 128)
+
+    return mask.point(lambda value: 0 if value == 128 else 255)
+
+
+def clip_to_mask(
+    img: Image.Image, mask: Image.Image, position: tuple[int, int] = (0, 0)
+) -> Image.Image:
+    layer = Image.new("RGBA", mask.size, (0, 0, 0, 0))
+    layer.paste(img, position)
+    layer.putalpha(ImageChops.multiply(layer.getchannel("A"), mask))
+
+    return layer
+
+
+def crop_transparent_margin(img: Image.Image, min_alpha: int = 128) -> Image.Image:
+    alpha = img.getchannel("A")
+
+    return img.crop(alpha.point(lambda value: 255 if value >= min_alpha else 0).getbbox())
+
+
 def layer_images(
     base_img: Image.Image, overlay_img: Image.Image, position: tuple[int, int] = (0, 0)
 ) -> Image.Image:
@@ -306,11 +341,13 @@ def generate_image(
         character_img = load_image_character(name, variante=variante)
         character_img = crop_image_rgba(character_img)
         character_img = resize_image_proportional(character_img, target_height=350)
+        inner_mask = card_inner_mask(cpu_img)
         if player >= 1 and player <= 8:
             cpu_img = apply_color_tint(cpu_img, tint_color=color[f"p{player}"])
             front_img = apply_color_tint(front_img, tint_color=color[f"p{player}"])
         character_x = round(cpu_img.width / 2 - alpha_center_x(character_img))
-        r = layer_images(cpu_img, character_img, position=(character_x, 30))
+        character_img = clip_to_mask(character_img, inner_mask, position=(character_x, 30))
+        r = layer_images(cpu_img, character_img)
         r = layer_images(r, front_img, position=(5, 276))
 
         r = draw_text_username(
@@ -331,6 +368,7 @@ def generate_image(
                 font_size=60,
             )
 
+        r = crop_transparent_margin(r)
         r = resize_image_proportional(r, target_width=200)
 
         if show:

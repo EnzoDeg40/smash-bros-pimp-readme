@@ -65,7 +65,8 @@ if __name__ == "__main__":
         else:
             renders_lines.append(f"![](.smash/assets/{name}.png)")
     
-    renders_content = "\n".join(renders_lines)
+    # No separator: a newline would render as a space between the images
+    renders_content = "".join(renders_lines)
 
     # Replace content between markers
     start_marker = "<!-- SMASH_TEAM_START -->"
