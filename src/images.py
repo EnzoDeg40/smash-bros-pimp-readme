@@ -140,6 +140,22 @@ def crop_image_center(
     return img.crop((left, top, right, bottom))
 
 
+def alpha_center_x(img: Image.Image) -> float:
+    # horizontal center of mass, so a long weapon doesn't shift the character
+    alpha = img.getchannel("A")
+    pixels = alpha.load()
+    width, height = alpha.size
+
+    total = 0
+    weighted = 0
+    for x in range(width):
+        for y in range(height):
+            total += pixels[x, y]
+            weighted += x * pixels[x, y]
+
+    return weighted / total if total else width / 2
+
+
 def layer_images(
     base_img: Image.Image, overlay_img: Image.Image, position: tuple[int, int] = (0, 0)
 ) -> Image.Image:
@@ -293,7 +309,8 @@ def generate_image(
         if player >= 1 and player <= 8:
             cpu_img = apply_color_tint(cpu_img, tint_color=color[f"p{player}"])
             front_img = apply_color_tint(front_img, tint_color=color[f"p{player}"])
-        r = layer_images(cpu_img, character_img, position=(0, 30))
+        character_x = round(cpu_img.width / 2 - alpha_center_x(character_img))
+        r = layer_images(cpu_img, character_img, position=(character_x, 30))
         r = layer_images(r, front_img, position=(5, 276))
 
         r = draw_text_username(
