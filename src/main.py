@@ -2,6 +2,7 @@ import os
 
 import yaml
 
+import coauthors
 import images
 
 if __name__ == "__main__":
@@ -58,6 +59,7 @@ if __name__ == "__main__":
 
     # Generate renders content with GitHub links
     renders_lines = []
+    github_logins = []
     for name, config in characters.items():
         if isinstance(config, str):
             github = None
@@ -65,6 +67,7 @@ if __name__ == "__main__":
             github = config.get("github")
         
         if github:
+            github_logins.append(str(github))
             renders_lines.append(f"[![{name}](.smash/assets/{name}.png)](https://github.com/{github})")
         else:
             renders_lines.append(f"![](.smash/assets/{name}.png)")
@@ -87,3 +90,7 @@ if __name__ == "__main__":
         print(f"\nREADME updated at {readme_path}")
     else:
         print(f"\nWarning: Could not find markers in README")
+
+    # Kept outside target-repo so it doesn't end up in the commit
+    with open("../commit-message.txt", "w") as f:
+        f.write(coauthors.build_commit_message(github_logins))
