@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 color = {
     "p1": (158, 238, 169),
@@ -347,9 +347,8 @@ def draw_text_player_number(
 def draw_controller_icon(
     img: Image.Image,
     controller: str,
-    center: tuple[int, int] = (72, 388),
-    max_size: tuple[int, int] = (104, 64),
-    outline_width: int = 2,
+    center: tuple[int, int] = (62, 390),
+    max_size: tuple[int, int] = (64, 44),
 ) -> Image.Image:
     icon = load_image_controller(controller)
     ratio = min(max_size[0] / icon.width, max_size[1] / icon.height)
@@ -358,17 +357,7 @@ def draw_controller_icon(
     )
     position = (center[0] - icon.width // 2, center[1] - icon.height // 2)
 
-    # black outline, so the icon stays readable on every player color
-    outline = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    outline.paste(icon, position)
-    outline_alpha = outline.getchannel("A").filter(
-        ImageFilter.MaxFilter(outline_width * 2 + 1)
-    )
-    outline = Image.new("RGBA", img.size, (0, 0, 0, 255))
-    outline.putalpha(outline_alpha)
-
-    r = layer_images(img, outline)
-    return layer_images(r, icon, position=position)
+    return layer_images(img, icon, position=position)
 
 
 def generate_image(
