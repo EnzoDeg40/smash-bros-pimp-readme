@@ -34,11 +34,15 @@ if __name__ == "__main__":
         if isinstance(config, str):
             character = config
             variant = 1
+            controller = None
         else:
             character = config.get("character")
             variant = config.get("variant", 1)
-        
-        img = images.generate_image(name, character, variante=variant, player=i)
+            controller = config.get("controller")
+
+        img = images.generate_image(
+            name, character, variante=variant, player=i, controller=controller
+        )
         if img:
             img.save(os.path.join(assets_path, f"{name}.png"))
             print(f"✅ Generated image for {name}")

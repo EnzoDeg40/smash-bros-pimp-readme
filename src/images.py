@@ -1,6 +1,6 @@
 import os
 
-from PIL import Image, ImageChops, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 color = {
     "p1": (158, 238, 169),
@@ -34,6 +34,19 @@ def load_image_game(name: str) -> Image.Image:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)
     base_path = os.path.join(project_root, "assets", "game")
+    filename = f"{name}.png"
+    path = os.path.join(base_path, filename)
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"The file {path} does not exist.")
+
+    img = Image.open(path).convert("RGBA")
+    return img
+
+
+def load_image_controller(name: str) -> Image.Image:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    base_path = os.path.join(project_root, "assets", "controllers")
     filename = f"{name}.png"
     path = os.path.join(base_path, filename)
     if not os.path.exists(path):
@@ -331,8 +344,40 @@ def draw_text_player_number(
     return img
 
 
+def draw_controller_icon(
+    img: Image.Image,
+    controller: str,
+    center: tuple[int, int] = (72, 388),
+    max_size: tuple[int, int] = (104, 64),
+    outline_width: int = 2,
+) -> Image.Image:
+    icon = load_image_controller(controller)
+    ratio = min(max_size[0] / icon.width, max_size[1] / icon.height)
+    icon = icon.resize(
+        (round(icon.width * ratio), round(icon.height * ratio)), Image.LANCZOS
+    )
+    position = (center[0] - icon.width // 2, center[1] - icon.height // 2)
+
+    # black outline, so the icon stays readable on every player color
+    outline = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    outline.paste(icon, position)
+    outline_alpha = outline.getchannel("A").filter(
+        ImageFilter.MaxFilter(outline_width * 2 + 1)
+    )
+    outline = Image.new("RGBA", img.size, (0, 0, 0, 255))
+    outline.putalpha(outline_alpha)
+
+    r = layer_images(img, outline)
+    return layer_images(r, icon, position=position)
+
+
 def generate_image(
-    username: str, name: str, variante: int = 1, player: int = 0, show: bool = False
+    username: str,
+    name: str,
+    variante: int = 1,
+    player: int = 0,
+    show: bool = False,
+    controller: str | None = None,
 ) -> Image.Image | None:
     try:
         cpu_img = load_image_game("cpu")
@@ -367,6 +412,9 @@ def generate_image(
                 position=(140, 360),
                 font_size=60,
             )
+
+        if controller:
+            r = draw_controller_icon(r, controller)
 
         r = crop_transparent_margin(r)
         r = resize_image_proportional(r, target_width=200)

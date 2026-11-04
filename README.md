@@ -18,6 +18,7 @@ jobs:
           character: kirby
           github: enzodeg40
           variant: 2
+          controller: gamecube
         bob:
           character: zelda
           github: bobsmith
@@ -31,6 +32,7 @@ jobs:
 - `character`: The fighter name (required). Check list of [fighters](assets/fighters).
 - `github`: GitHub username to link the image (optional).
 - `variant`: Character variant number (optional, default: 1). Available variants depend on the character.
+- `controller`: Controller icon shown on the card (optional, default: none). One of `gamecube`, `xbox`, `ps5`, `keyboard`, `switch`, `switch_pro`, `wii`, `tablet`, `steam_frame`.
 
 **Simple format** (backward compatible):
 ```yml
