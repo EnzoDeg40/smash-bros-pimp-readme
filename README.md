@@ -46,3 +46,5 @@ Add the following to `README.md`:
 <!-- SMASH_TEAM_START -->
 <!-- SMASH_TEAM_END -->
 ```
+
+Images are generated in `.smash/assets/`. Any `.png` in this folder that doesn't match a current character is deleted on each run, so don't keep your own images there.

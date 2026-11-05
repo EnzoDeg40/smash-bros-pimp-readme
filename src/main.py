@@ -13,6 +13,15 @@ def build_alt(name: str, character: str) -> str:
     return f"{character_label} - {username[:1].upper()}{username[1:]}"
 
 
+def remove_unused_assets(assets_path: str, names) -> None:
+    # Only cards are removed: other files may have been added by the repo owner
+    expected = {f"{name}.png" for name in names}
+    for filename in sorted(os.listdir(assets_path)):
+        if filename.endswith(".png") and filename not in expected:
+            os.remove(os.path.join(assets_path, filename))
+            print(f"🗑️  Removed unused image {filename}")
+
+
 if __name__ == "__main__":
     characters_raw = os.environ.get("CHARACTERS")
 
@@ -58,6 +67,8 @@ if __name__ == "__main__":
         else:
             print(f"❌ Failed to generate image for {name}")
         i += 1
+
+    remove_unused_assets(assets_path, characters)
 
     # Update README in target repo
     readme_path = "../target-repo/README.md"
