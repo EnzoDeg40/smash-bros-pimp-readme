@@ -5,6 +5,14 @@ import yaml
 import coauthors
 import images
 
+
+def build_alt(name: str, character: str) -> str:
+    # e.g. "kirby" and "enzo" give "Kirby - Enzo"
+    character_label = str(character).replace("_", " ").title()
+    username = str(name)
+    return f"{character_label} - {username[:1].upper()}{username[1:]}"
+
+
 if __name__ == "__main__":
     characters_raw = os.environ.get("CHARACTERS")
 
@@ -62,15 +70,18 @@ if __name__ == "__main__":
     github_logins = []
     for name, config in characters.items():
         if isinstance(config, str):
+            character = config
             github = None
         else:
+            character = config.get("character")
             github = config.get("github")
-        
+
+        alt = build_alt(name, character)
         if github:
             github_logins.append(str(github))
-            renders_lines.append(f"[![{name}](.smash/assets/{name}.png)](https://github.com/{github})")
+            renders_lines.append(f"[![{alt}](.smash/assets/{name}.png)](https://github.com/{github})")
         else:
-            renders_lines.append(f"![](.smash/assets/{name}.png)")
+            renders_lines.append(f"![{alt}](.smash/assets/{name}.png)")
     
     # No separator: a newline would render as a space between the images
     renders_content = "".join(renders_lines)
